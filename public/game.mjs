@@ -87,51 +87,24 @@ socket.on("connect", () => {
   socket.on("updatePlayers", (players, item) => {
     // players = { id1: {x, y}, id2: {x, y}, ... }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    let isCollision = false;
-
+    const playersLength = Object.keys(players).length;
     Object.values(players).forEach((p) => {
       const player = new Player({ x: p.x, y: p.y, score: p.score, id: p.id });
       const color = p.color;
       if (p.id === socket.id) {
         currentPlayer = player;
         scoreboard.innerHTML = `Score: ${player.score}`;
-        if (p.rank) {
-          currentRank = p.rank;
-          rankboard.innerHTML = p.rank;
-        } else {
-          currentRank = player.calculateRank(Object.values(players));
-          rankboard.innerHTML = currentRank;
+        rankboard.innerHTML = `Rank: ${p.rank ?? 1}/${playersLength}`;
+
+        if (player.collision(item)) {
+          socket.emit("itemCollected", { id: socket.id });
         }
       }
 
       renderAvatar(player, color, socket.id === p.id);
 
       renderCollectible(item);
-
-      if (player.collision(item)) {
-        isCollision = true;
-
-        p.score += item.value;
-
-        socket.emit("itemCollected", { id: player.id, score: p.score });
-      }
     });
-    if (isCollision) {
-      Object.values(players).forEach((p) => {
-        const player = new Player({
-          x: p.x,
-          y: p.y,
-          score: p.score,
-          id: p.id,
-        });
-        const rank = player.calculateRank(Object.values(players));
-        p.rank = rank;
-        rankboard.innerHTML = rank;
-      });
-      isCollision = false;
-
-      socket.emit("updateRank", players);
-    }
   });
 });
 

@@ -6,6 +6,7 @@ function execIO(io) {
   let item = null;
 
   io.on("connection", (socket) => {
+    console.log("Jugador conectado:", socket.id);
     players[socket.id] = createPlayer(socket.id, canvasWidth, canvasHeight);
 
     if (item) {
@@ -14,6 +15,7 @@ function execIO(io) {
       item = createItem(canvasWidth, canvasHeight);
       io.emit("updatePlayers", players, item);
     }
+    calculateRanks(players);
 
     socket.on("playerMove", (data) => {
       if (players[socket.id]) {
@@ -27,15 +29,14 @@ function execIO(io) {
 
     socket.on("itemCollected", (data) => {
       const id = data.id;
-      const score = data.score;
-      if (players[id]) {
-        players[id].score = score;
+
+      if (players[id] && socket.id === id) {
+        players[id].score += item.value;
       }
       item = createItem(canvasWidth, canvasHeight);
-    });
 
-    socket.on("updateRank", (players) => {
-      players = players;
+      calculateRanks(players);
+
       io.emit("updatePlayers", players, item);
     });
 
@@ -44,6 +45,7 @@ function execIO(io) {
       console.log("Motivo de desconexión:", reason);
 
       delete players[socket.id];
+      if (!Object.keys(players).length) item = null;
 
       io.emit("updatePlayers", players, item);
     });
@@ -75,4 +77,8 @@ function createItem(canvasWidth, canvasHeight) {
   return { x: x_random, y: y_random, value };
 }
 
+function calculateRanks(players) {
+  const sorted = Object.values(players).sort((a, b) => b.score - a.score);
+  sorted.forEach((p, i) => (p.rank = i + 1));
+}
 module.exports = execIO;

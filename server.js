@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const expect = require("chai");
 const socket = require("socket.io");
 const cors = require("cors");
+const path = require("path");
 
 const { createServer } = require("node:http");
 const fccTestingRoutes = require("./routes/fcctesting.js");
@@ -21,8 +22,8 @@ app.use(noCache());
 app.use(noSniff());
 app.use(xssFilter());
 
-app.use("/public", express.static(process.cwd() + "/public"));
-app.use("/assets", express.static(process.cwd() + "/assets"));
+app.use("/public", express.static(path.join(process.cwd(), "public")));
+app.use("/assets", express.static(path.join(process.cwd(), "assets")));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -36,7 +37,7 @@ const io = socket(server);
 
 // Index page (static HTML)
 app.route("/").get(function (req, res) {
-  res.sendFile(process.cwd() + "/views/index.html");
+  res.sendFile(path.join(__dirname, "views", "index.html"));
 });
 
 connections(io);
