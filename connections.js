@@ -23,6 +23,7 @@ function execIO(io) {
       }
 
       if (existCollision(item, players[id]) && socket.id === id) {
+        console.log("collected");
         players[id].score += item.value;
         item = createItem(configCanvas.canvasWidth, configCanvas.canvasHeight);
         calculateRanks(players);
