@@ -42,12 +42,6 @@ socket.on("connect", () => {
     });
   });
 
-  document.querySelectorAll(".btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const dir = btn.className.split(" ")[1];
-    });
-  });
-
   let intervalId = null;
 
   function startMoving(dir) {
