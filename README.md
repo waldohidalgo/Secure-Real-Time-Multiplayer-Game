@@ -1,6 +1,8 @@
 # Secure Real Time Multiplayer Game
 
-Código solución al quinto y último proyecto requisito obligatorio para obtener la **Information Security Certification** de freecodecamp. El proyecto consiste en crear un juego de multiples jugadores en tiempo real utilizando Socket.io. El proyecto lo he desarrollado en local para luego ejecutarlo en gitpod.
+Código solución al quinto y último proyecto requisito obligatorio para obtener la **Information Security Certification** de freecodecamp. El proyecto consiste en crear un juego de multiples jugadores en tiempo real utilizando Socket.io. El proyecto lo he desarrollado de dos formas complementarias: en local y para pruebas rapidas de sincronia he utilizado gitpod. Luego de hacer las pruebas de sincronización y eliminar condiciones de carrera problemáticas, he desplegado el proyecto a [render](https://secure-real-time-multiplayer-game-1.onrender.com/).
+
+Además, para poder probarlo en móviles he creado un pad para utilizar touch.
 
 ## Tabla de Contenidos
 
