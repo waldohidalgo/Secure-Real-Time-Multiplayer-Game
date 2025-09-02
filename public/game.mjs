@@ -69,24 +69,18 @@ socket.on("connect", () => {
   });
 
   socket.on("updatePlayers", (players, item) => {
-    // players = { id1: {x, y}, id2: {x, y}, ... }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const playersLength = Object.keys(players).length;
+
+    if (players[socket.id] && socket.id === players[socket.id].id) {
+      const p = players[socket.id];
+      scoreboard.innerHTML = `Score: ${p.score}`;
+      rankboard.innerHTML = `Rank: ${p.rank ?? 1}/${playersLength}`;
+    }
+    renderCollectible(item);
     Object.values(players).forEach((p) => {
-      const player = new Player({ x: p.x, y: p.y, score: p.score, id: p.id });
       const color = p.color;
-      if (p.id === socket.id) {
-        scoreboard.innerHTML = `Score: ${player.score}`;
-        rankboard.innerHTML = `Rank: ${p.rank ?? 1}/${playersLength}`;
-
-        if (player.collision(item)) {
-          socket.emit("itemCollected", { id: socket.id });
-        }
-      }
-
-      renderAvatar(player, color, socket.id === p.id);
-
-      renderCollectible(item);
+      renderAvatar(p, color, socket.id === p.id);
     });
   });
 });

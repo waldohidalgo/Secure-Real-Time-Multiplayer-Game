@@ -16,20 +16,27 @@ function execIO(io) {
     calculateRanks(players);
 
     socket.on("playerMove", (data) => {
-      if (players[data.id]) {
-        const player = players[data.id];
+      const id = data.id;
+      if (players[id]) {
+        const player = players[id];
         movePlayer(player, data.dir);
       }
-    });
 
-    socket.on("itemCollected", ({ id }) => {
-      console.log("item collected", id);
-      if (players[id]) {
+      if (existCollision(item, players[id]) && socket.id === id) {
         players[id].score += item.value;
         item = createItem(configCanvas.canvasWidth, configCanvas.canvasHeight);
         calculateRanks(players);
       }
     });
+
+    // socket.on("itemCollected", ({ id }) => {
+    //   console.log("item collected", id);
+    //   if (players[id] && id === socket.id) {
+    //     players[id].score += item.value;
+    //     item = createItem(configCanvas.canvasWidth, configCanvas.canvasHeight);
+    //     calculateRanks(players);
+    //   }
+    // });
 
     socket.on("disconnect", () => {
       delete players[socket.id];
@@ -106,4 +113,11 @@ function movePlayer(player, dir, speed = 5) {
   }
 }
 
+function existCollision(item, player) {
+  // item=> Collectible
+  const distance = Math.sqrt(
+    (player.x - item.x) ** 2 + (player.y - item.y) ** 2
+  );
+  return distance < 20;
+}
 module.exports = execIO;
