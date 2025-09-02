@@ -1,55 +1,45 @@
-const canvasWidth = 640;
-const canvasHeight = 480;
-
+const configCanvas = {
+  canvasWidth: 640,
+  canvasHeight: 480,
+  avatarSize: 20,
+};
 function execIO(io) {
   let players = {};
-  let item = null;
+  let item = createItem(configCanvas.canvasWidth, configCanvas.canvasHeight);
 
   io.on("connection", (socket) => {
-    console.log("Jugador conectado:", socket.id);
-    players[socket.id] = createPlayer(socket.id, canvasWidth, canvasHeight);
-
-    if (item) {
-      io.emit("updatePlayers", players, item);
-    } else {
-      item = createItem(canvasWidth, canvasHeight);
-      io.emit("updatePlayers", players, item);
-    }
+    players[socket.id] = createPlayer(
+      socket.id,
+      configCanvas.canvasWidth,
+      configCanvas.canvasHeight
+    );
     calculateRanks(players);
 
     socket.on("playerMove", (data) => {
-      if (players[socket.id]) {
-        players[socket.id].x = data.x;
-        players[socket.id].y = data.y;
-        players[socket.id].score = data.score;
-
-        io.emit("updatePlayers", players, item);
+      if (players[data.id]) {
+        const player = players[data.id];
+        movePlayer(player, data.dir);
       }
     });
 
-    socket.on("itemCollected", (data) => {
-      const id = data.id;
-
-      if (players[id] && socket.id === id) {
+    socket.on("itemCollected", ({ id }) => {
+      console.log("item collected", id);
+      if (players[id]) {
         players[id].score += item.value;
+        item = createItem(configCanvas.canvasWidth, configCanvas.canvasHeight);
+        calculateRanks(players);
       }
-      item = createItem(canvasWidth, canvasHeight);
-
-      calculateRanks(players);
-
-      io.emit("updatePlayers", players, item);
     });
 
-    socket.on("disconnect", (reason) => {
-      console.log("Jugador desconectado:", socket.id);
-      console.log("Motivo de desconexión:", reason);
-
+    socket.on("disconnect", () => {
       delete players[socket.id];
-      if (!Object.keys(players).length) item = null;
-
-      io.emit("updatePlayers", players, item);
     });
   });
+
+  // 👇 loop centralizado, manda estado 20 veces por segundo
+  setInterval(() => {
+    io.emit("updatePlayers", players, item);
+  }, 50);
 }
 
 function createPlayer(socketId, canvasWidth, canvasHeight) {
@@ -81,4 +71,35 @@ function calculateRanks(players) {
   const sorted = Object.values(players).sort((a, b) => b.score - a.score);
   sorted.forEach((p, i) => (p.rank = i + 1));
 }
+
+function movePlayer(player, dir, speed = 5) {
+  const x = player.x;
+  const y = player.y;
+
+  const leftLimit = configCanvas.avatarSize;
+  const rightLimit = configCanvas.canvasWidth - 2 * configCanvas.avatarSize;
+  const topLimit = configCanvas.avatarSize;
+  const bottomLimit = configCanvas.canvasHeight - 2 * configCanvas.avatarSize;
+
+  if (dir === "left" && x - speed < leftLimit) return;
+  if (dir === "right" && x + speed > rightLimit) return;
+  if (dir === "up" && y - speed < topLimit) return;
+  if (dir === "down" && y + speed > bottomLimit) return;
+
+  switch (dir) {
+    case "left":
+      player.x = x - speed;
+      break;
+    case "right":
+      player.x = x + speed;
+      break;
+    case "up":
+      player.y = y - speed;
+      break;
+    case "down":
+      player.y = y + speed;
+      break;
+  }
+}
+
 module.exports = execIO;

@@ -8,8 +8,6 @@ const rankboard = document.getElementById("rankboard");
 const scoreboard = document.getElementById("scoreboard");
 
 socket.on("connect", () => {
-  let currentPlayer;
-  let currentRank;
   document.addEventListener("keydown", (e) => {
     let dir;
     if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
@@ -32,13 +30,9 @@ socket.on("connect", () => {
         return;
     }
 
-    currentPlayer.movePlayer(dir, 5);
-
     socket.emit("playerMove", {
       id: socket.id,
-      x: currentPlayer.x,
-      y: currentPlayer.y,
-      score: currentPlayer.score,
+      dir,
     });
   });
 
@@ -47,13 +41,9 @@ socket.on("connect", () => {
   function startMoving(dir) {
     if (intervalId) return;
     intervalId = setInterval(() => {
-      currentPlayer.movePlayer(dir, 5);
-
       socket.emit("playerMove", {
         id: socket.id,
-        x: currentPlayer.x,
-        y: currentPlayer.y,
-        score: currentPlayer.score,
+        dir,
       });
     }, 50);
   }
@@ -86,7 +76,6 @@ socket.on("connect", () => {
       const player = new Player({ x: p.x, y: p.y, score: p.score, id: p.id });
       const color = p.color;
       if (p.id === socket.id) {
-        currentPlayer = player;
         scoreboard.innerHTML = `Score: ${player.score}`;
         rankboard.innerHTML = `Rank: ${p.rank ?? 1}/${playersLength}`;
 
