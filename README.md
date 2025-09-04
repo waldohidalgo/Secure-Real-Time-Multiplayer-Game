@@ -11,7 +11,7 @@ Además, para poder probarlo en móviles he creado un pad para utilizar touch.
   - [Requisitos](#requisitos)
   - [Screenshots](#screenshots)
     - [Un jugador](#un-jugador)
-    - [Tres Jugadores](#tres-jugadores)
+    - [Dos Jugadores](#dos-jugadores)
   - [Test Unitarios Aprobados](#test-unitarios-aprobados)
     - [Tests unitarios aprobados en local](#tests-unitarios-aprobados-en-local)
     - [Tests unitarios aprobados en producción](#tests-unitarios-aprobados-en-producción)
@@ -25,11 +25,11 @@ Además, para poder probarlo en móviles he creado un pad para utilizar touch.
 
 ### Un jugador
 
-![Un jugador](./screenshots/un_player.webp)
+![Un jugador](./screenshots/one_player.webp)
 
-### Tres Jugadores
+### Dos Jugadores
 
-![Tres Jugadores](./screenshots/tres_players.webp)
+![Tres Jugadores](./screenshots/two_players.webp)
 
 ## Test Unitarios Aprobados
 

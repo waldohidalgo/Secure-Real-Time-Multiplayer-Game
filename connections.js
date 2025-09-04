@@ -41,6 +41,7 @@ function execIO(io) {
 
     socket.on("disconnect", () => {
       delete players[socket.id];
+      calculateRanks(players);
       if (Object.keys(players).length === 0) {
         players = {};
         item = createItem(configCanvas.canvasWidth, configCanvas.canvasHeight);
